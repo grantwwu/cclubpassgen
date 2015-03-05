@@ -1,12 +1,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <openssl/sha.h>
 
 /*
  * Calculates
- * base64encode( SHA256( master + salt + host ) )
+ * hexencode( SHA256( master + salt + host ) )
  */
 char* pass_gen(const char *master, size_t mlen,
                const char *salt, size_t slen,
