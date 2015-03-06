@@ -2,15 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <openssl/sha.h>
+#include "passgen.h"
 
 /*
  * Calculates
- * hexencode( SHA256( master + salt + host ) ) and writes it to dst
- * dst should be able to hold at least 64 chars followed by a null terminator
+ * hexencode( SHA512( master + salt + host ) ) and writes it to dst
+ * dst should be able to hold at least DIGEST_LENGTH chars followed by a null terminator
  */
 void passgen(const char *master, size_t mlen,
-              const char *salt, size_t slen,
-              const char *host, size_t hlen, char *dst)
+             const char *salt, size_t slen,
+             const char *host, size_t hlen, char *dst)
 {
   //Check that inputs are valid c strings
   if(master[mlen] != '\0' || salt[slen] != '\0' || host[hlen] != '\0' ||
@@ -33,9 +34,9 @@ void passgen(const char *master, size_t mlen,
   strncpy(concat + mlen + slen, host, hlen + 1);
 
   //digest is *not* a c string and contains binary data.
-  char digest[33]; // SHA256_DIGEST_LENGTH + 1
+  char digest[DIGEST_LENGTH];
 
-  SHA256((unsigned char*) concat, mlen + slen + hlen, (unsigned char*) digest);
+  SHA512((unsigned char*) concat, mlen + slen + hlen, (unsigned char*) digest);
 
   memset(concat, 0, mlen + slen + hlen);
   free(concat);
@@ -44,7 +45,7 @@ void passgen(const char *master, size_t mlen,
                      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
   //Calculate hex conversion
-  for(int i = 0; i < 32; i++)
+  for(int i = 0; i < DIGEST_LENGTH; i++)
   {
     char left = (digest[i] >> 4) & 0x0F;
     char right = digest[i] & 0x0F;
@@ -52,7 +53,7 @@ void passgen(const char *master, size_t mlen,
     dst[2*i+1] = table[(int) right];
   }
 
-  dst[64] = '\0';
+  dst[HEX_DIGEST_LENGTH] = '\0';
 
-  memset(digest, 0, SHA256_DIGEST_LENGTH);
+  memset(digest, 0, DIGEST_LENGTH);
 }
