@@ -17,7 +17,7 @@ void passgen(const char *master, size_t mlen,
   if(master[mlen] != '\0' || salt[slen] != '\0' || host[hlen] != '\0' ||
      strlen(master) != mlen || strlen(salt) != slen || strlen(host) != hlen)
   {
-    fprintf(stderr, "FATAL ERROR: Unsafe C String!\n");
+    fprintf(stderr, "%s", "FATAL ERROR: Unsafe C String!\n");
     abort();
   }
 
@@ -25,7 +25,7 @@ void passgen(const char *master, size_t mlen,
   char *concat = calloc(1, mlen + slen + hlen + 1);
   if(concat == NULL)
   {
-    fprintf(stderr, "FATAL ERROR: Malloc returned null");
+    fprintf(stderr, "%s", "FATAL ERROR: Malloc returned null");
     abort();
   }
 
